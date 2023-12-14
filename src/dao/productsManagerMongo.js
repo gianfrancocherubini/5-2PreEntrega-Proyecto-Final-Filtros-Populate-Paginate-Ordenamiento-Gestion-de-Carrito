@@ -4,7 +4,7 @@ class ProductsManager {
     
     async getProducts() {
         try {
-            const products = await ProductEsquema.find({deleted:false}).exec();
+            const products = await ProductEsquema.find({deleted:false}).lean();
             return products;
         } catch (error) {
             console.log("No hay productos en la base de datos.");
@@ -23,7 +23,7 @@ class ProductsManager {
 
     async getProductById(productId) {
         try {
-            const product = await ProductEsquema.findOne({deleted:false, _id:productId}).exec();
+            const product = await ProductEsquema.findOne({deleted:false, _id:productId}).lean();
 
             if (product) {
                 console.log("El producto encontrado es:", product);

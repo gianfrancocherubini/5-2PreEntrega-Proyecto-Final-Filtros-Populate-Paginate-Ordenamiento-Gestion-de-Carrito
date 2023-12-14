@@ -11,19 +11,19 @@ router.get('/', async (req, res) => {
         let products = await productsManager.getProducts();
 
         if (!products || products.length === 0) {
-            res.setHeader('Content-Type', 'application/json');
+            res.setHeader('Content-Type', 'text/html');
             res.status(200).render('home',({ Products: [] }));
             return;
         }
 
         if (limit) {
-            let limitedProducts = products.slice(0, parseInt(limit, 40));
-            res.setHeader('Content-Type', 'application/json');
+            let limitedProducts = products.slice(0, parseInt(limit, 10));
+            res.setHeader('Content-Type', 'text/html');
             res.status(200).render('home',({ Products: limitedProducts }));
             console.log(limitedProducts);
         } else {
-            res.setHeader('Content-Type', 'application/json');
-            res.status(200).json({ products });
+            res.setHeader('Content-Type', 'text/html');
+            res.status(200).render('home',({ products }));
             console.log(products);
         }
     } catch (error) {
@@ -54,7 +54,7 @@ router.get('/:pid', async (req, res) => {
             return;
         }
 
-        res.setHeader('Content-Type', 'application/json');
+        res.setHeader('Content-Type', 'text/html');
         res.status(200).render('home',({ Product: product }));
     } catch (error) {
         console.error(error);
