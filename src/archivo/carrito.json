@@ -1,0 +1,43 @@
+[
+    {
+      "id": 1,
+      "products": [
+        {
+          "product": {
+            "id": 3,
+            "title": "Zapatilla 3",
+            "description": "Zapatilla deportiva 3",
+            "price": 5400,
+            "thumbnails": [
+              "https://www.stockcenter.com.ar/on/demandware.static/-/Sites-365-dabra-catalog/default/dw2a22ff7a/products/AD_GW4140/AD_GW4140-1.JPG",
+              "https://www.stockcenter.com.ar/on/demandware.static/-/Sites-365-dabra-catalog/default/dw3fa9499e/products/AD_GW4140/AD_GW4140-2.JPG",
+              "https://www.stockcenter.com.ar/on/demandware.static/-/Sites-365-dabra-catalog/default/dwc40b9067/products/AD_GW4140/AD_GW4140-3.JPG"
+            ],
+            "code": "AA12346",
+            "stock": 30,
+            "status": true,
+            "category": "zapatillas"
+          },
+          "quantity": 9
+        },
+        {
+          "product": {
+            "id": 5,
+            "title": "Zapatilla 5",
+            "description": "Zapatilla deportiva 5",
+            "price": 76000,
+            "thumbnails": [
+              "https://www.stockcenter.com.ar/on/demandware.static/-/Sites-365-dabra-catalog/default/dw27221429/products/ADHP2416/ADHP2416-1.JPG",
+              "https://www.stockcenter.com.ar/on/demandware.static/-/Sites-365-dabra-catalog/default/dwa3f88b1e/products/ADHP2416/ADHP2416-2.JPG",
+              "https://www.stockcenter.com.ar/on/demandware.static/-/Sites-365-dabra-catalog/default/dw022c9224/products/ADHP2416/ADHP2416-3.JPG"
+            ],
+            "code": "AA12348",
+            "stock": 760,
+            "status": true,
+            "category": "zapatillas"
+          },
+          "quantity": 9
+        }
+      ]
+    }
+  ]
