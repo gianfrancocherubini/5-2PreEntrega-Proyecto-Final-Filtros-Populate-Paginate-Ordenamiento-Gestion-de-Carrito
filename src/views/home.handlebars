@@ -12,33 +12,18 @@
   </div>
 {{/each}}
 
-{{#if limitedProducts}}
-  <h2>Limited Products</h2>
-  {{#each limitedProducts}}
-    <div class="limited-product">
-      <img src="{{thumbnails.[0]}}" alt="{{title}}">
-      <h3>{{title}}</h3>
-      <p>{{description}}</p>
-      <p>Precio: {{price}}</p>
-      <p>Stock: {{stock}}</p>
-      <p>Categoría: {{category}}</p>
-      <button>Agregar al carrito</button>
-    </div>
-  {{/each}}
-{{/if}}
 <br>
 
-<a href="/?pagina=1">Pagina 1</a>
+<a href="/home?pagina=1{{#if currentCategory}}&category={{currentCategory}}{{/if}}">Pagina 1</a>
 
 {{#if hasPrevPage}}
-<a href="/?pagina={{prevPage}}">Pagina Anterior</a>
+  <a href="/home?pagina={{prevPage}}{{#if currentCategory}}&category={{currentCategory}}{{/if}}">Pagina Anterior</a>
 {{/if}}
 
-
-{{#if havNextPage}}
-<a href="/?pagina={{nextPage}}">Pagina Siguiente</a>
+{{#if hasNextPage}}
+  <a href="/home?pagina={{nextPage}}{{#if currentCategory}}&category={{currentCategory}}{{/if}}">Pagina Siguiente</a>
 {{/if}}
 
+<a href="/home?pagina={{totalPages}}{{#if currentCategory}}&category={{currentCategory}}{{/if}}">Ultima Pagina</a>
 
-<a href="/?pagina={{totalPages}}">Ultima Pagina</a>
 

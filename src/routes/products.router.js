@@ -1,28 +1,62 @@
 const {Router}=require('express')
-// const ProductsManager = require('../dao/productsManagerMongo');
 const productEsquema = require('../dao/models/products.model')
-// const productsManager =new ProductsManager()
 
 const router=Router()
  
 router.get('/', async (req, res) => {
-    let products
+
     try {
-        products = await productEsquema.paginate({},{lean:true});
+        let page = parseInt(req.query.pagina) || 1;
+        let limit = parseInt(req.query.limit) || 2;
+        let category = req.query.category; 
+        let query = {};
+
+        if (category) {
+            query.category = category;
+        }
+               
+        let products = await productEsquema.paginate(query, { lean: true, limit, page });
+        let { totalPages, hasNextPage, hasPrevPage, prevPage , nextPage} = products
+        if (page > totalPages) {
+            return res.redirect(`/home?pagina=${totalPages}${category ? `&category=${category}` : ''}`);
+        }
         res.setHeader('Content-Type', 'text/html');
-        res.status(200).render('home',{products: products.docs });
+        res.status(200).render('home',{
+            products: products.docs,
+            totalPages: products.totalPages,
+            hasNextPage: products.hasNextPage,
+            hasPrevPage: products.hasPrevPage,
+            prevPage: products.prevPage,
+            nextPage: products.nextPage,
+            currentPage: page,
+            currentCategory: category  // Asegúrate de pasar la categoría a la vista
+        });
         console.log(products);
         
-    } catch (error) {
+    } catch (err) {
+        console.error(err);
+        res.setHeader('Content-Type', 'application/json');
+        res.status(500).json({ error: 'Error al obtener productos' });
+    }
+});
+
+router.get('/category', async (req, res) => {
+    try {
+        let category = req.query.category
+        if (!category) {
+            // Si no se proporciona una categoría, redirigir a la página principal
+            return res.redirect('/');
+        } 
+        let products = await productsEsquema.paginate({ category }, { lean: true })
+        res.setHeader('Content-Type', 'text/html');
+        res.status(200).render('home',{products: products.docs});
+    }catch{
         console.error(error);
         res.setHeader('Content-Type', 'application/json');
         res.status(500).json({ error: 'Error al obtener productos' });
     }
 
-    
 });
-
-
 router.post('/', async (req, res) => {
     try {
         const newProductData = req.body;
