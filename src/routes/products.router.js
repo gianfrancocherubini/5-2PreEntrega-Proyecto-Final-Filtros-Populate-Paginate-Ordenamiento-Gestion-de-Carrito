@@ -1,31 +1,18 @@
 const {Router}=require('express')
-const ProductsManager = require('../dao/productsManagerMongo');
+// const ProductsManager = require('../dao/productsManagerMongo');
 const productEsquema = require('../dao/models/products.model')
-const productsManager =new ProductsManager()
+// const productsManager =new ProductsManager()
 
 const router=Router()
  
 router.get('/', async (req, res) => {
+    let products
     try {
-        let limit = req.query.limit;
-        let products = await productsManager.getProducts();
-
-        if (!products || products.length === 0) {
-            res.setHeader('Content-Type', 'text/html');
-            res.status(200).render('home',({ Products: [] }));
-            return;
-        }
-
-        if (limit) {
-            let limitedProducts = products.slice(0, parseInt(limit, 10));
-            res.setHeader('Content-Type', 'text/html');
-            res.status(200).render('home',({ Products: limitedProducts }));
-            console.log(limitedProducts);
-        } else {
-            res.setHeader('Content-Type', 'text/html');
-            res.status(200).render('home',({ products }));
-            console.log(products);
-        }
+        products = await productEsquema.paginate({},{lean:true});
+        res.setHeader('Content-Type', 'text/html');
+        res.status(200).render('home',{products: products.docs });
+        console.log(products);
+        
     } catch (error) {
         console.error(error);
         res.setHeader('Content-Type', 'application/json');
@@ -35,33 +22,6 @@ router.get('/', async (req, res) => {
     
 });
 
-router.get('/:pid', async (req, res) => {
-    try {
-        const productId = req.params.pid;
-
-        if (!productId) {
-            res.setHeader('Content-Type', 'application/json');
-            res.status(400).json({ error: 'Se debe proporcionar un ID de producto válido.' });
-            console.log('Se debe proporcionar un ID de producto válido.');
-            return;
-        }
-
-        const product = await productsManager.getProductById(productId);
-
-        if (!product) {
-            res.setHeader('Content-Type', 'application/json');
-            res.status(404).json({ error: 'Producto no encontrado.' });
-            return;
-        }
-
-        res.setHeader('Content-Type', 'text/html');
-        res.status(200).render('home',({ Product: product }));
-    } catch (error) {
-        console.error(error);
-        res.setHeader('Content-Type', 'application/json');
-        res.status(500).json({ error: 'Error al obtener el producto.' });
-    }
-});
 
 router.post('/', async (req, res) => {
     try {
