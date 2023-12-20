@@ -17,6 +17,7 @@ router.get('/', async (req, res) => {
                
         let products = await productEsquema.paginate(query, { lean: true, limit, page });
         let { totalPages, hasNextPage, hasPrevPage, prevPage , nextPage} = products
+        
         if (page > totalPages) {
             return res.redirect(`/home?pagina=${totalPages}${category ? `&category=${category}` : ''}`);
         }
@@ -61,6 +62,7 @@ router.post('/', async (req, res) => {
     try {
         const newProductData = req.body;
         const requiredFields = ['title', 'description', 'price', 'thumbnails', 'code', 'stock', 'category'];
+
         for (const field of requiredFields) {
             if (!newProductData[field]) {
                 res.setHeader('Content-Type', 'application/json');
@@ -69,16 +71,15 @@ router.post('/', async (req, res) => {
             }
         }
 
-        const existingProducts = await productsManager.getProducts();
-        const existingProduct = existingProducts.find(product => product.code === newProductData.code);
-
-        if (existingProduct) {
+        const existingProducts = await productEsquema.findOne({ code: newProductData.code });
+       
+        if (existingProducts) {
             res.setHeader('Content-Type', 'application/json');
             res.status(400).json({ error: `Ya existe un producto con el código '${newProductData.code}'.` });
             return;
         }
 
-        await productsManager.saveProducts([newProductData]);
+        await productEsquema.create(newProductData);
         res.setHeader('Content-Type', 'application/json');
         res.status(201).json({ success: true, message: 'Producto agregado correctamente.', newProductData });
         console.log('Producto agregado:', newProductData);
@@ -91,37 +92,38 @@ router.post('/', async (req, res) => {
 
 router.put('/:pid', async (req, res) => {
     try {
-
         const productId = req.params.pid;
-        
-        const existingProduct = await productsManager.getProductById(productId);
+
+        // Buscar el producto existente por _id
+        const existingProduct = await productEsquema.findById(productId);
 
         if (!existingProduct) {
             res.setHeader('Content-Type', 'application/json');
-            res.status(404).json({ error: 'Producto no encontrado.' });
-            return;
+            return res.status(404).json({ error: 'Producto no encontrado.' });
         }
 
-        if(req.body._id){
-            res.setHeader('Content-Type','application/json');
-            return res.status(500).json({error:`No se puede modificar la porpiedad "_id"`});
+        // Verificar si la propiedad _id está presente en el cuerpo de la solicitud
+        if ('_id' in req.body) {
+            res.setHeader('Content-Type', 'application/json');
+            return res.status(400).json({ error: 'No se puede modificar la propiedad "_id".' });
         }
 
-        const updateResult = await productEsquema.updateOne({ _id: productId }, { $set: req.body });
-        if (updateResult.modifiedCount > 0) {
+        // Actualizar el producto utilizando findByIdAndUpdate
+        const updateResult = await productEsquema.findByIdAndUpdate(productId, { $set: req.body });
+
+        if (updateResult) {
+            console.log('Producto actualizado:', updateResult);
             res.setHeader('Content-Type', 'application/json');
             return res.status(200).json({ success: true, message: 'Modificación realizada.' });
         } else {
             res.setHeader('Content-Type', 'application/json');
             return res.status(400).json({ error: 'No se concretó la modificación.' });
         }
-
     } catch (error) {
         console.error(error);
         res.setHeader('Content-Type', 'application/json');
-        res.status(500).json({ error: 'Error al actualizar el producto.' });
+        return res.status(500).json({ error: 'Error al actualizar el producto.' });
     }
-
 });
 
 module.exports = {router} ;
