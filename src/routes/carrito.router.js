@@ -1,6 +1,7 @@
 const { Router } = require('express');
 const CarritoManager = require('../dao/carritoManagerMongo');
 const cm = new CarritoManager();
+const CartsEsquema = require('../dao/models/carrito.model')
 
 const router = Router();
 
@@ -27,7 +28,7 @@ router.get('/:cid', async (req, res) => {
             return;
         }
 
-        const cart = await cm.getCartById(cartId);
+        const cart = await cm.getCartById(cartId).populate('items.product').lean();
 
         if (!cart) {
             res.setHeader('Content-Type', 'application/json');

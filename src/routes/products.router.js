@@ -1,28 +1,34 @@
+// http://localhost:3014/home para acceder a todos los productos
+// http://localhost:3014/home?category=computadoras para acceder a las computadoras
+// http://localhost:3014/home?category=celulares  para acceder a los celulares
+
+
+
+
 const {Router}=require('express')
-const productEsquema = require('../dao/models/products.model')
+const ProductEsquema = require('../dao/models/products.model')
 
 const router=Router()
  
 router.get('/', async (req, res) => {
-
     try {
         let page = parseInt(req.query.pagina) || 1;
-        let limit = parseInt(req.query.limit) || 2;
         let category = req.query.category; 
         let query = {};
 
         if (category) {
             query.category = category;
         }
-               
-        let products = await productEsquema.paginate(query, { lean: true, limit, page });
-        let { totalPages, hasNextPage, hasPrevPage, prevPage , nextPage} = products
-        
+
+        let products = await ProductEsquema.paginate(query, { lean: true, limit: 2, page });
+        let { totalPages, hasNextPage, hasPrevPage, prevPage, nextPage } = products;
+
         if (page > totalPages) {
             return res.redirect(`/home?pagina=${totalPages}${category ? `&category=${category}` : ''}`);
         }
+
         res.setHeader('Content-Type', 'text/html');
-        res.status(200).render('home',{
+        res.status(200).render('home', {
             products: products.docs,
             totalPages: products.totalPages,
             hasNextPage: products.hasNextPage,
@@ -33,7 +39,6 @@ router.get('/', async (req, res) => {
             currentCategory: category  // Asegúrate de pasar la categoría a la vista
         });
         console.log(products);
-        
     } catch (err) {
         console.error(err);
         res.setHeader('Content-Type', 'application/json');
@@ -41,23 +46,7 @@ router.get('/', async (req, res) => {
     }
 });
 
-router.get('/category', async (req, res) => {
-    try {
-        let category = req.query.category
-        if (!category) {
-            // Si no se proporciona una categoría, redirigir a la página principal
-            return res.redirect('/');
-        } 
-        let products = await productsEsquema.paginate({ category }, { lean: true })
-        res.setHeader('Content-Type', 'text/html');
-        res.status(200).render('home',{products: products.docs});
-    }catch{
-        console.error(error);
-        res.setHeader('Content-Type', 'application/json');
-        res.status(500).json({ error: 'Error al obtener productos' });
-    }
 
-});
 router.post('/', async (req, res) => {
     try {
         const newProductData = req.body;
@@ -71,7 +60,7 @@ router.post('/', async (req, res) => {
             }
         }
 
-        const existingProducts = await productEsquema.findOne({ code: newProductData.code });
+        const existingProducts = await ProductEsquema.findOne({ code: newProductData.code });
        
         if (existingProducts) {
             res.setHeader('Content-Type', 'application/json');
@@ -79,7 +68,7 @@ router.post('/', async (req, res) => {
             return;
         }
 
-        await productEsquema.create(newProductData);
+        await ProductEsquema.create(newProductData);
         res.setHeader('Content-Type', 'application/json');
         res.status(201).json({ success: true, message: 'Producto agregado correctamente.', newProductData });
         console.log('Producto agregado:', newProductData);
@@ -95,7 +84,7 @@ router.put('/:pid', async (req, res) => {
         const productId = req.params.pid;
 
         // Buscar el producto existente por _id
-        const existingProduct = await productEsquema.findById(productId);
+        const existingProduct = await ProductEsquema.findById(productId);
 
         if (!existingProduct) {
             res.setHeader('Content-Type', 'application/json');
@@ -109,7 +98,7 @@ router.put('/:pid', async (req, res) => {
         }
 
         // Actualizar el producto utilizando findByIdAndUpdate
-        const updateResult = await productEsquema.findByIdAndUpdate(productId, { $set: req.body });
+        const updateResult = await ProductEsquema.findByIdAndUpdate(productId, { $set: req.body });
 
         if (updateResult) {
             console.log('Producto actualizado:', updateResult);
