@@ -2,9 +2,6 @@
 // http://localhost:3014/home?category=computadoras para acceder a las computadoras
 // http://localhost:3014/home?category=celulares  para acceder a los celulares
 
-
-
-
 const {Router}=require('express')
 const ProductEsquema = require('../dao/models/products.model')
 

@@ -1,7 +1,10 @@
+// listo el post para crear carrito
+
+
 const { Router } = require('express');
 const CarritoManager = require('../dao/carritoManagerMongo');
 const cm = new CarritoManager();
-const CartsEsquema = require('../dao/models/carrito.model')
+
 
 const router = Router();
 
@@ -28,7 +31,7 @@ router.get('/:cid', async (req, res) => {
             return;
         }
 
-        const cart = await cm.getCartById(cartId).populate('items.product').lean();
+        const cart = await cm.getCartById(cartId);
 
         if (!cart) {
             res.setHeader('Content-Type', 'application/json');
@@ -41,8 +44,9 @@ router.get('/:cid', async (req, res) => {
             items: cart.items || [], 
         };
 
-        res.setHeader('Content-Type', 'application/json');
-        res.status(200).json(response);
+        res.setHeader('Content-Type', 'text/html');
+        res.status(200).render('carrito', {carts : cart}) ;
+        console.log(response)
     } catch (error) {
         console.error(error);
         res.setHeader('Content-Type', 'application/json');
