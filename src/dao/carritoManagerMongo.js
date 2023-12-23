@@ -23,7 +23,7 @@ class CarritoManager {
 
     async getCartById(cartId) {
       try {
-          return await CartsEsquema.findOne({_id: cartId}).populate('items.product').lean();
+          return await CartsEsquema.findById({_id: cartId}).populate('items.product').lean();
       } catch (error) {
           console.error("Error al obtener el carrito por ID:", error);
           throw error;
@@ -66,6 +66,52 @@ class CarritoManager {
         console.error('Error al agregar producto al carrito:', error);
         throw error;
       }
+    }
+
+    async deleteProductToCart(cartId, productId) {
+        try {
+            const cart = await CartsEsquema.findById(cartId);
+    
+            if (!cart) {
+                throw new Error('Carrito no encontrado.');
+            }
+    
+            const existingItemIndex = cart.items.findIndex(item => item.product.equals(productId));
+    
+            if (existingItemIndex !== -1) {
+                // Elimina el producto del array de items
+                cart.items.splice(existingItemIndex, 1);
+            } else {
+                throw new Error('Producto no encontrado en el carrito.');
+            }
+    
+            // Llama a save para aplicar los cambios en la base de datos
+            await cart.save();
+    
+            const updatedCart = await CartsEsquema.findById(cartId);
+            return updatedCart;
+        } catch (error) {
+            console.error('Error al eliminar producto del carrito:', error);
+            throw error;
+        }
+    }
+    async deleteCart(cartId) {
+        try {
+            const cart = await CartsEsquema.findById(cartId);
+    
+            if (!cart) {
+                throw new Error('Carrito no encontrado.');
+            }
+    
+            // Elimina el carrito directamente
+            await CartsEsquema.findByIdAndDelete(cartId);
+    
+            // Retorna el carrito eliminado
+            return `Carrito ${cartId} eliminado`;
+        } catch (error) {
+            console.error('Error al eliminar el carrito:', error);
+            throw error;
+        }
     }
 }
 
