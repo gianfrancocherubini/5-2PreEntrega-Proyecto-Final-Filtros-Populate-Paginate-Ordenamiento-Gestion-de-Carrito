@@ -39,14 +39,9 @@ router.get('/:cid', async (req, res) => {
             return;
         }
 
-        const response = {
-            _id: cart._id,
-            items: cart.items || [], 
-        };
-
         res.setHeader('Content-Type', 'text/html');
         res.status(200).render('carrito', {carts : cart}) ;
-        console.log(response)
+        console.log(cart.items)
     } catch (error) {
         console.error(error);
         res.setHeader('Content-Type', 'application/json');
